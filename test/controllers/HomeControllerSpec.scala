@@ -1,45 +1,23 @@
 package controllers
 
-import org.scalatestplus.play._
-import org.scalatestplus.play.guice._
-import play.api.test._
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.test.Helpers._
+import play.api.test.FakeRequest
+import play.api.libs.json.Json
 
-/**
- * Add your spec here.
- * You can mock out a whole application including requests, plugins etc.
- *
- * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
- */
-class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+class HomeControllerSpec extends AnyWordSpec with GuiceOneAppPerSuite with Matchers {
 
-  "HomeController GET" should {
-
-    "render the index page from a new instance of controller" in {
-      val controller = new HomeController(stubControllerComponents())
-      val home = controller.index().apply(FakeRequest(GET, "/"))
-
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
-    }
-
-    "render the index page from the application" in {
-      val controller = inject[HomeController]
-      val home = controller.index().apply(FakeRequest(GET, "/"))
-
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
-    }
-
-    "render the index page from the router" in {
+  "HomeController GET /" should {
+    "return 200 OK with empty JSON object" in {
+      val controller = app.injector.instanceOf[HomeController]
       val request = FakeRequest(GET, "/")
-      val home = route(app, request).get
+      val result = controller.index().apply(request)
 
-      status(home) mustBe OK
-      contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+      status(result) shouldBe OK
+      contentType(result) shouldBe Some("application/json")
+      contentAsJson(result) shouldBe Json.obj()
     }
   }
 }
