@@ -6,7 +6,8 @@ import play.api.libs.json.Json
 import play.api.mvc._
 
 @Singleton
-class HomeController @Inject()(val controllerComponents: ControllerComponents) extends BaseController {
+class HomeController @Inject() (val controllerComponents: ControllerComponents)
+    extends BaseController {
   def index(): Action[AnyContent] = Action { implicit request: Request[AnyContent] =>
     Ok(Json.obj())
   }
