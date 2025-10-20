@@ -1,0 +1,28 @@
+# === Scala / sbt ===
+target/
+lib_managed/
+src_managed/
+project/target/
+project/project/
+
+# === IntelliJ IDEA ===
+.idea/
+*.iml
+out/
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Logs and temp ===
+*.log
+*.tmp
+
+# === Build artifacts ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === Scala Worksheet output ===
+*.worksheet.sc
