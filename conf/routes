@@ -16,3 +16,4 @@ POST    /mcp/resources/call         controllers.McpController.callResource
 
 # MCP Tools
 GET     /mcp/tools                  controllers.McpController.listTools
+POST    /mcp/tools/call             controllers.McpController.callTool

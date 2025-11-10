@@ -83,4 +83,36 @@ class McpController @Inject() (
     Ok(Json.toJson(tools))
   }
 
+  def callTool: Action[JsValue] = Action(parse.json) { req =>
+    req.body.validate[ToolCallRequest] match {
+      case JsSuccess(call, _) =>
+        call.name match {
+          case other =>
+            NotFound(
+              Json.toJson(
+                CallResult(
+                  success = false,
+                  data = Json.obj(
+                    "error" -> s"Unknown tool: $other"
+                  )
+                )
+              )
+            )
+        }
+
+      case JsError(errs) =>
+        BadRequest(
+          Json.toJson(
+            CallResult(
+              success = false,
+              data = Json.obj(
+                "error" -> "Invalid JSON body for ToolCallRequest",
+                "details" -> errs.toString
+              )
+            )
+          )
+        )
+    }
+  }
+
 }

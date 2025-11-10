@@ -41,4 +41,10 @@ object McpProtocol {
   )
   implicit val toolFormat: OFormat[Tool] = Json.format[Tool]
 
+  case class ToolCallRequest(
+    name: String,
+    params: JsObject
+  )
+  implicit val toolCallRequestFormat: OFormat[ToolCallRequest] = Json.format[ToolCallRequest]
+
 }
