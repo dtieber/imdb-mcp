@@ -6,13 +6,14 @@ import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
 import play.api.mvc._
 
 import models.McpProtocol._
-import service.MovieService
+import service.{ BookmarkService, MovieService }
 
 @Singleton
 class McpController @Inject() (
   cc: ControllerComponents
 ) extends AbstractController(cc) {
 
+  private val bookmarkService = new BookmarkService
   private val movieService = new MovieService
 
   def health: Action[AnyContent] = Action {
@@ -79,7 +80,20 @@ class McpController @Inject() (
   }
 
   def listTools: Action[AnyContent] = Action {
-    val tools = Seq.empty[Tool]
+    val bookmark = Tool(
+      name = "bookmark",
+      description = "Adds a movie title to the bookmark list",
+      paramsSchema = Json.obj(
+        "type" -> "object",
+        "properties" -> Json.obj(
+          "movie" -> Json.obj("type" -> "string")
+        ),
+        "required" -> Json.arr("movie"),
+        "additionalProperties" -> false
+      )
+    )
+
+    val tools = Seq(bookmark)
     Ok(Json.toJson(tools))
   }
 
@@ -87,6 +101,35 @@ class McpController @Inject() (
     req.body.validate[ToolCallRequest] match {
       case JsSuccess(call, _) =>
         call.name match {
+          case "bookmark" =>
+            val movieOpt = (call.params \ "movie").asOpt[String]
+            movieOpt match {
+              case Some(movie) =>
+                bookmarkService.bookmark(movie)
+                Ok(
+                  Json.toJson(
+                    CallResult(
+                      success = true,
+                      data = Json.obj(
+                        "message" -> s"Bookmarked '$movie'",
+                        "bookmarks" -> bookmarkService.listBookmarks()
+                      )
+                    )
+                  )
+                )
+              case None =>
+                BadRequest(
+                  Json.toJson(
+                    CallResult(
+                      success = false,
+                      data = Json.obj(
+                        "error" -> "Missing parameter 'movie'"
+                      )
+                    )
+                  )
+                )
+            }
+
           case other =>
             NotFound(
               Json.toJson(

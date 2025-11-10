@@ -4,3 +4,10 @@ curl -X POST http://localhost:9000/mcp/resources/call \
     "name": "getMovies",
     "params": {}
   }
+
+curl -X POST http://localhost:9000/mcp/tools/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "bookmark",
+    "params": { "movie": "Inception" }
+  }'
