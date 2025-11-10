@@ -14,4 +14,11 @@ object McpProtocol {
   )
   implicit val schemaFormat: OFormat[Schema] = Json.format[Schema]
 
+  case class Resource(
+    name: String,
+    description: String,
+    paramsSchema: JsObject
+  )
+  implicit val resourceFormat: OFormat[Resource] = Json.format[Resource]
+
 }

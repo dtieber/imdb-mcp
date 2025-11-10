@@ -28,4 +28,9 @@ class McpController @Inject() (
     )
   }
 
+  def listResources: Action[AnyContent] = Action {
+    val resources = Seq.empty[Resource]
+    Ok(Json.toJson(resources))
+  }
+
 }
