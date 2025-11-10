@@ -1,0 +1,6 @@
+curl -X POST http://localhost:9000/mcp/resources/call \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "getMovies",
+    "params": {}
+  }

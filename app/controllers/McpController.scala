@@ -6,11 +6,14 @@ import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
 import play.api.mvc._
 
 import models.McpProtocol._
+import service.MovieService
 
 @Singleton
 class McpController @Inject() (
   cc: ControllerComponents
 ) extends AbstractController(cc) {
+
+  private val movieService = new MovieService
 
   def health: Action[AnyContent] = Action {
     Ok(Json.toJson(Health("ok")))
@@ -29,7 +32,13 @@ class McpController @Inject() (
   }
 
   def listResources: Action[AnyContent] = Action {
-    val resources = Seq.empty[Resource]
+    val getMovies = Resource(
+      name = "getMovies",
+      description = "Returns a list of movie titles",
+      paramsSchema = Json.obj()
+    )
+
+    val resources = Seq(getMovies)
     Ok(Json.toJson(resources))
   }
 
@@ -37,6 +46,10 @@ class McpController @Inject() (
     req.body.validate[ResourceCallRequest] match {
       case JsSuccess(call, _) =>
         call.name match {
+          case "getMovies" =>
+            val movies = movieService.getMovies
+            Ok(Json.toJson(CallResult(success = true, data = Json.obj("movies" -> movies))))
+
           case other =>
             NotFound(
               Json.toJson(
