@@ -13,3 +13,6 @@ GET     /mcp/schema                 controllers.McpController.schema
 # MCP Resources
 GET     /mcp/resources              controllers.McpController.listResources
 POST    /mcp/resources/call         controllers.McpController.callResource
+
+# MCP Tools
+GET     /mcp/tools                  controllers.McpController.listTools
