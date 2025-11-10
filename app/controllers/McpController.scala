@@ -16,4 +16,16 @@ class McpController @Inject() (
     Ok(Json.toJson(Health("ok")))
   }
 
+  def schema: Action[AnyContent] = Action {
+    Ok(
+      Json.toJson(
+        Schema(
+          name = "mcp-movies",
+          version = "0.1.0",
+          description = "MCP server to expose movie resources and a bookmarking tool"
+        )
+      )
+    )
+  }
+
 }

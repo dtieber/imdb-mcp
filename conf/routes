@@ -8,3 +8,4 @@ GET     /                           controllers.HomeController.index()
 
 # MCP discovery
 GET     /mcp/health                 controllers.McpController.health
+GET     /mcp/schema                 controllers.McpController.schema
