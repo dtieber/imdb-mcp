@@ -5,3 +5,6 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
+
+# MCP discovery
+GET     /mcp/health                 controllers.McpController.health
