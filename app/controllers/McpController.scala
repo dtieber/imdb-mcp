@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import play.api.libs.json.Json
+import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
 import play.api.mvc._
 
 import models.McpProtocol._
@@ -31,6 +31,38 @@ class McpController @Inject() (
   def listResources: Action[AnyContent] = Action {
     val resources = Seq.empty[Resource]
     Ok(Json.toJson(resources))
+  }
+
+  def callResource: Action[JsValue] = Action(parse.json) { req =>
+    req.body.validate[ResourceCallRequest] match {
+      case JsSuccess(call, _) =>
+        call.name match {
+          case other =>
+            NotFound(
+              Json.toJson(
+                CallResult(
+                  success = false,
+                  data = Json.obj(
+                    "error" -> s"Unknown resource: $other"
+                  )
+                )
+              )
+            )
+        }
+
+      case JsError(errs) =>
+        BadRequest(
+          Json.toJson(
+            CallResult(
+              success = false,
+              data = Json.obj(
+                "error" -> "Invalid JSON body for ResourceCallRequest",
+                "details" -> errs.toString
+              )
+            )
+          )
+        )
+    }
   }
 
 }

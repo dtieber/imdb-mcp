@@ -21,4 +21,17 @@ object McpProtocol {
   )
   implicit val resourceFormat: OFormat[Resource] = Json.format[Resource]
 
+  case class ResourceCallRequest(
+    name: String,
+    params: JsObject
+  )
+  implicit val resourceCallRequestFormat: OFormat[ResourceCallRequest] =
+    Json.format[ResourceCallRequest]
+
+  case class CallResult(
+    success: Boolean,
+    data: JsValue
+  )
+  implicit val callResultFormat: OFormat[CallResult] = Json.format[CallResult]
+
 }
