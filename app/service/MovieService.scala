@@ -1,28 +1,30 @@
 package service
 
+import models.Movie
+
 class MovieService {
 
-  private val movies: Vector[String] = Vector(
-    "The Godfather",
-    "The Dark Knight",
-    "Pulp Fiction",
-    "Inception",
-    "Fight Club",
-    "Forrest Gump",
-    "The Matrix",
-    "Interstellar",
-    "Parasite",
-    "Spirited Away",
-    "The Lord of the Rings",
-    "City of God",
-    "Se7en",
-    "Whiplash",
-    "Gladiator",
-    "The Silence of the Lambs",
-    "Saving Private Ryan"
+  private val movies: List[Movie] = List(
+    Movie(1, "The Godfather"),
+    Movie(2, "The Dark Knight"),
+    Movie(3, "Pulp Fiction"),
+    Movie(4, "Inception"),
+    Movie(5, "Fight Club"),
+    Movie(6, "Forrest Gump"),
+    Movie(7, "The Matrix"),
+    Movie(8, "Interstellar"),
+    Movie(9, "Parasite"),
+    Movie(10, "Spirited Away"),
+    Movie(11, "The Lord of the Rings"),
+    Movie(12, "City of God"),
+    Movie(13, "Se7en"),
+    Movie(14, "Whiplash"),
+    Movie(15, "Gladiator"),
+    Movie(16, "The Silence of the Lambs"),
+    Movie(17, "Saving Private Ryan")
   )
 
-  def getMovies: Seq[String] = {
+  def getMovies: Seq[Movie] = {
     movies
   }
 
