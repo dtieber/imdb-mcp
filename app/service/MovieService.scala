@@ -1,6 +1,6 @@
 package service
 
-import models.Movie
+import models.{ Failure, Movie }
 
 class MovieService {
 
@@ -26,6 +26,13 @@ class MovieService {
 
   def getMovies: Seq[Movie] = {
     movies
+  }
+
+  def getMovieByName(name: String): Either[Failure, Movie] = {
+    movies.find(_.title.equalsIgnoreCase(name)) match {
+      case Some(movie) => Right(movie)
+      case None        => Left(Failure(s"Movie with name '$name' not found"))
+    }
   }
 
 }
