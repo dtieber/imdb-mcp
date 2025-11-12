@@ -19,4 +19,6 @@ class BookmarkService(movieService: MovieService) {
   }
 
   def listBookmarks(): List[Movie] = bookmarks.iterator().asScala.toList
+
+  def resetBookmarks(): Unit = bookmarks.clear()
 }
