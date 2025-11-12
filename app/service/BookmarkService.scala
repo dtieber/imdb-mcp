@@ -3,12 +3,20 @@ package service
 import java.util.concurrent.ConcurrentLinkedQueue
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class BookmarkService {
-  private val bookmarks = new ConcurrentLinkedQueue[String]()
+import models.{ Failure, Movie }
 
-  def bookmark(movie: String): Unit = {
-    bookmarks.add(movie)
+class BookmarkService(movieService: MovieService) {
+  private val bookmarks = new ConcurrentLinkedQueue[Movie]()
+
+  def bookmark(movieName: String): Either[Failure, Movie] = {
+    movieService.getMovieByName(movieName) match {
+      case Right(movie) =>
+        bookmarks.add(movie)
+        Right(movie)
+      case Left(failure) =>
+        Left(failure)
+    }
   }
 
-  def listBookmarks(): List[String] = bookmarks.iterator().asScala.toList
+  def listBookmarks(): List[Movie] = bookmarks.iterator().asScala.toList
 }

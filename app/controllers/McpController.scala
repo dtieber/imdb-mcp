@@ -13,8 +13,8 @@ class McpController @Inject() (
   cc: ControllerComponents
 ) extends AbstractController(cc) {
 
-  private val bookmarkService = new BookmarkService
   private val movieService = new MovieService
+  private val bookmarkService = new BookmarkService(movieService)
 
   def health: Action[AnyContent] = Action {
     Ok(Json.toJson(Health("ok")))
@@ -105,18 +105,31 @@ class McpController @Inject() (
             val movieOpt = (call.params \ "movie").asOpt[String]
             movieOpt match {
               case Some(movie) =>
-                bookmarkService.bookmark(movie)
-                Ok(
-                  Json.toJson(
-                    CallResult(
-                      success = true,
-                      data = Json.obj(
-                        "message" -> s"Bookmarked '$movie'",
-                        "bookmarks" -> bookmarkService.listBookmarks()
+                bookmarkService.bookmark(movie) match {
+                  case Right(bookmarkedMovie) =>
+                    Ok(
+                      Json.toJson(
+                        CallResult(
+                          success = true,
+                          data = Json.obj(
+                            "message" -> s"Bookmarked '${bookmarkedMovie.title}'",
+                            "bookmarks" -> bookmarkService.listBookmarks()
+                          )
+                        )
                       )
                     )
-                  )
-                )
+                  case Left(error) =>
+                    BadRequest(
+                      Json.toJson(
+                        CallResult(
+                          success = false,
+                          data = Json.obj(
+                            "message" -> error.message
+                          )
+                        )
+                      )
+                    )
+                }
               case None =>
                 BadRequest(
                   Json.toJson(
