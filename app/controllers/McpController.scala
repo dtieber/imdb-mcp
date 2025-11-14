@@ -42,23 +42,30 @@ class McpController @Inject() (
   }
 
   def callResource: Action[JsValue] = Action(parse.json) { req =>
-    req.body.validate[ResourceCallRequest] match {
-      case JsSuccess(call, _) =>
-        call.name match {
-          case "getMovies" =>
-            val movies = movieService.getMovies
-            ResponseUtils.successResponse(Json.obj("movies" -> movies))
+    validate[ResourceCallRequest](req.body) { call =>
+      dispatchResource(call)
+    }
+  }
 
-          case other =>
-            ResponseUtils.notFoundResponse(s"Unknown resource: $other")
-        }
-
+  private def validate[T](json: JsValue)(onValid: T => Result)(implicit reads: Reads[T]): Result =
+    json.validate[T] match {
+      case JsSuccess(value, _) => onValid(value)
       case JsError(errs) =>
         ResponseUtils.badRequestResponse(
           "Invalid JSON body for ResourceCallRequest",
           Some(errs.toString)
         )
     }
+
+  private def dispatchResource(call: ResourceCallRequest): Result =
+    call.name match {
+      case "getMovies" => handleGetMovies(call)
+      case other       => ResponseUtils.notFoundResponse(s"Unknown resource: $other")
+    }
+
+  private def handleGetMovies(call: ResourceCallRequest): Result = {
+    val movies = movieService.getMovies
+    ResponseUtils.successResponse(Json.obj("movies" -> movies))
   }
 
   def listTools: Action[AnyContent] = Action {
