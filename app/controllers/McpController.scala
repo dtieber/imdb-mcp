@@ -87,40 +87,43 @@ class McpController @Inject() (
   }
 
   def callTool: Action[JsValue] = Action(parse.json) { req =>
-    req.body.validate[ToolCallRequest] match {
-      case JsSuccess(call, _) =>
-        call.name match {
-          case "bookmark" =>
-            val movieOpt = (call.params \ "movie").asOpt[String]
-            movieOpt match {
-              case Some(movie) =>
-                bookmarkService.bookmark(movie) match {
-                  case Right(bookmarkedMovie) =>
-                    ResponseUtils.successResponse(
-                      Json.obj(
-                        "message" -> s"Bookmarked '${bookmarkedMovie.title}'",
-                        "bookmarks" -> bookmarkService.listBookmarks()
-                      )
-                    )
-
-                  case Left(error) =>
-                    ResponseUtils.badRequestResponse(error.message)
-                }
-
-              case None =>
-                ResponseUtils.badRequestResponse("Missing parameter 'movie'")
-            }
-
-          case other =>
-            ResponseUtils.notFoundResponse(s"Unknown tool: $other")
-        }
-
-      case JsError(errs) =>
-        ResponseUtils.badRequestResponse(
-          "Invalid JSON body for ToolCallRequest",
-          Some(errs.toString)
-        )
+    validateAs[ToolCallRequest](req.body, "ToolCallRequest") { call =>
+      dispatchTool(call)
     }
   }
+
+  private def dispatchTool(call: ToolCallRequest): Result =
+    call.name match {
+      case "bookmark" => handleBookmark(call)
+      case other      => ResponseUtils.notFoundResponse(s"Unknown tool: $other")
+    }
+
+  private def handleBookmark(call: ToolCallRequest): Result = {
+    (call.params \ "movie").asOpt[String] match {
+      case Some(movieName) =>
+        bookmarkService.bookmark(movieName) match {
+          case Right(bookmarkedMovie) =>
+            ResponseUtils.successResponse(
+              Json.obj(
+                "message" -> s"Bookmarked '${bookmarkedMovie.title}'",
+                "bookmarks" -> bookmarkService.listBookmarks()
+              )
+            )
+          case Left(err) =>
+            ResponseUtils.badRequestResponse(err.message)
+        }
+      case None =>
+        ResponseUtils.badRequestResponse("Missing parameter 'movie'")
+    }
+  }
+
+  private def validateAs[T](json: JsValue, label: String)(
+    onValid: T => Result
+  )(implicit reads: Reads[T]): Result =
+    json.validate[T] match {
+      case JsSuccess(value, _) => onValid(value)
+      case JsError(errs) =>
+        ResponseUtils.badRequestResponse(s"Invalid JSON body for $label", Some(errs.toString))
+    }
 
 }
