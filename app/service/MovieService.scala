@@ -1,5 +1,7 @@
 package service
 
+import org.slf4j.LoggerFactory
+
 import models.{ Failure, Movie }
 
 class MovieService {
@@ -24,14 +26,22 @@ class MovieService {
     Movie(17, "Saving Private Ryan")
   )
 
+  private val logger = LoggerFactory.getLogger(classOf[MovieService])
+
   def getMovies: Seq[Movie] = {
+    logger.info("Fetching the complete list of movies.")
     movies
   }
 
   def getMovieByName(name: String): Either[Failure, Movie] = {
+    logger.info(s"Searching for a movie with name: '$name'")
     movies.find(_.title.equalsIgnoreCase(name)) match {
-      case Some(movie) => Right(movie)
-      case None        => Left(Failure(s"Movie with name '$name' not found"))
+      case Some(movie) =>
+        logger.info(s"Movie found: ${movie.title} (ID: ${movie.id})")
+        Right(movie)
+      case None =>
+        logger.warn(s"Movie with name '$name' not found.")
+        Left(Failure(s"Movie with name '$name' not found"))
     }
   }
 
