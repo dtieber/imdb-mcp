@@ -6,6 +6,9 @@
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index()
 
+# Streamable MCP
+POST   /mcp                         controllers.McpApiController.mcp
+
 # MCP discovery
 GET     /mcp/health                 controllers.McpHumanController.health
 GET     /mcp/schema                 controllers.McpHumanController.schema
