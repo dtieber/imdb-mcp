@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import play.api.libs.json.{ JsError, JsSuccess, JsValue, Json }
+import play.api.libs.json._
 import play.api.mvc._
 
 import models.McpProtocol._
@@ -17,17 +17,15 @@ class McpController @Inject() (
   private val bookmarkService = new BookmarkService(movieService)
 
   def health: Action[AnyContent] = Action {
-    Ok(Json.toJson(Health("ok")))
+    ResponseUtils.successResponse(Json.obj("status" -> "ok"))
   }
 
   def schema: Action[AnyContent] = Action {
-    Ok(
-      Json.toJson(
-        Schema(
-          name = "mcp-movies",
-          version = "0.1.0",
-          description = "MCP server to expose movie resources and a bookmarking tool"
-        )
+    ResponseUtils.successResponse(
+      Json.obj(
+        "name" -> "mcp-movies",
+        "version" -> "0.1.0",
+        "description" -> "MCP server to expose movie resources and a bookmarking tool"
       )
     )
   }
@@ -40,7 +38,7 @@ class McpController @Inject() (
     )
 
     val resources = Seq(getMovies)
-    Ok(Json.toJson(resources))
+    ResponseUtils.successResponse(Json.obj("resources" -> Json.toJson(resources)))
   }
 
   def callResource: Action[JsValue] = Action(parse.json) { req =>
@@ -49,32 +47,16 @@ class McpController @Inject() (
         call.name match {
           case "getMovies" =>
             val movies = movieService.getMovies
-            Ok(Json.toJson(CallResult(success = true, data = Json.obj("movies" -> movies))))
+            ResponseUtils.successResponse(Json.obj("movies" -> movies))
 
           case other =>
-            NotFound(
-              Json.toJson(
-                CallResult(
-                  success = false,
-                  data = Json.obj(
-                    "error" -> s"Unknown resource: $other"
-                  )
-                )
-              )
-            )
+            ResponseUtils.notFoundResponse(s"Unknown resource: $other")
         }
 
       case JsError(errs) =>
-        BadRequest(
-          Json.toJson(
-            CallResult(
-              success = false,
-              data = Json.obj(
-                "error" -> "Invalid JSON body for ResourceCallRequest",
-                "details" -> errs.toString
-              )
-            )
-          )
+        ResponseUtils.badRequestResponse(
+          "Invalid JSON body for ResourceCallRequest",
+          Some(errs.toString)
         )
     }
   }
@@ -94,7 +76,7 @@ class McpController @Inject() (
     )
 
     val tools = Seq(bookmark)
-    Ok(Json.toJson(tools))
+    ResponseUtils.successResponse(Json.obj("tools" -> Json.toJson(tools)))
   }
 
   def callTool: Action[JsValue] = Action(parse.json) { req =>
@@ -107,66 +89,29 @@ class McpController @Inject() (
               case Some(movie) =>
                 bookmarkService.bookmark(movie) match {
                   case Right(bookmarkedMovie) =>
-                    Ok(
-                      Json.toJson(
-                        CallResult(
-                          success = true,
-                          data = Json.obj(
-                            "message" -> s"Bookmarked '${bookmarkedMovie.title}'",
-                            "bookmarks" -> bookmarkService.listBookmarks()
-                          )
-                        )
+                    ResponseUtils.successResponse(
+                      Json.obj(
+                        "message" -> s"Bookmarked '${bookmarkedMovie.title}'",
+                        "bookmarks" -> bookmarkService.listBookmarks()
                       )
                     )
+
                   case Left(error) =>
-                    BadRequest(
-                      Json.toJson(
-                        CallResult(
-                          success = false,
-                          data = Json.obj(
-                            "message" -> error.message
-                          )
-                        )
-                      )
-                    )
+                    ResponseUtils.badRequestResponse(error.message)
                 }
+
               case None =>
-                BadRequest(
-                  Json.toJson(
-                    CallResult(
-                      success = false,
-                      data = Json.obj(
-                        "error" -> "Missing parameter 'movie'"
-                      )
-                    )
-                  )
-                )
+                ResponseUtils.badRequestResponse("Missing parameter 'movie'")
             }
 
           case other =>
-            NotFound(
-              Json.toJson(
-                CallResult(
-                  success = false,
-                  data = Json.obj(
-                    "error" -> s"Unknown tool: $other"
-                  )
-                )
-              )
-            )
+            ResponseUtils.notFoundResponse(s"Unknown tool: $other")
         }
 
       case JsError(errs) =>
-        BadRequest(
-          Json.toJson(
-            CallResult(
-              success = false,
-              data = Json.obj(
-                "error" -> "Invalid JSON body for ToolCallRequest",
-                "details" -> errs.toString
-              )
-            )
-          )
+        ResponseUtils.badRequestResponse(
+          "Invalid JSON body for ToolCallRequest",
+          Some(errs.toString)
         )
     }
   }
