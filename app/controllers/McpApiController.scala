@@ -23,7 +23,7 @@ class McpApiController @Inject() (
   private val serverCapabilities: JsObject = Json.obj(
     "tools" -> Json.obj("list" -> true, "call" -> true),
     "resources" -> Json.obj("list" -> true, "read" -> true),
-    "prompts" -> Json.obj()
+    "prompts" -> Json.obj("list" -> false, "get" -> false, "call" -> false)
   )
 
   def mcp: Action[JsValue] = Action(parse.json) { req =>
