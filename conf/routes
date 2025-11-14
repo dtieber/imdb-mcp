@@ -7,13 +7,13 @@
 GET     /                           controllers.HomeController.index()
 
 # MCP discovery
-GET     /mcp/health                 controllers.McpController.health
-GET     /mcp/schema                 controllers.McpController.schema
+GET     /mcp/health                 controllers.McpHumanController.health
+GET     /mcp/schema                 controllers.McpHumanController.schema
 
 # MCP Resources
-GET     /mcp/resources              controllers.McpController.listResources
-POST    /mcp/resources/call         controllers.McpController.callResource
+GET     /mcp/resources              controllers.McpHumanController.listResources
+POST    /mcp/resources/call         controllers.McpHumanController.callResource
 
 # MCP Tools
-GET     /mcp/tools                  controllers.McpController.listTools
-POST    /mcp/tools/call             controllers.McpController.callTool
+GET     /mcp/tools                  controllers.McpHumanController.listTools
+POST    /mcp/tools/call             controllers.McpHumanController.callTool

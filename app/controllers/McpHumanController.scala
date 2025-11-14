@@ -9,7 +9,7 @@ import models.McpProtocol._
 import service.{ BookmarkService, MovieService }
 
 @Singleton
-class McpController @Inject() (
+class McpHumanController @Inject() (
   cc: ControllerComponents
 ) extends AbstractController(cc) {
 

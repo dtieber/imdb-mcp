@@ -7,9 +7,9 @@ import play.api.mvc.Results
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 
-class McpControllerTest extends AnyWordSpec with Matchers {
+class McpHumanControllerTest extends AnyWordSpec with Matchers {
 
-  private val controller = new McpController(stubControllerComponents())
+  private val controller = new McpHumanController(stubControllerComponents())
 
   "McpController" should {
 
